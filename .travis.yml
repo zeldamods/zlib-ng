@@ -1,12 +1,63 @@
-language: c
-compiler:
-  - gcc
-  - clang
+addons:
+  coverity_scan:
+    project:
+      name: Dead2/zlib-ng
+    notification_email: zlib-travis@circlestorm.org
+    build_command_prepend: "./configure --zlib-compat"
+    build_command: make
+    branch_pattern: coverity_scan
+
 env:
-  - BUILDDIR=. TOOL="./configure --zlib-compat"
-  - BUILDDIR=../build TOOL="../zlib-ng/configure --zlib-compat"
-  - BUILDDIR=. TOOL="./configure --zlib-compat --without-optimizations --without-new-strategies"
-  - BUILDDIR=. TOOL="cmake ."
-  - BUILDDIR=../build TOOL="cmake ../zlib-ng"
-script: mkdir -p $BUILDDIR && cd $BUILDDIR &&
-        $TOOL && make && make test
+  global:
+    secure: sE6rhT5z+iw1xy/7ir0nyiR/Cv+yqPpWfT+RcbcYMZFLTYaMCpXjJ2TUDb3O8sK73jjnd9oH1xixp1gg3JjpNx6El9hJz8pheo05G3OPyjCCSEwBhIeWo6nf/CJ5l3EFybxwDN/5untcgZfQyF9ZUII998AjCIv1NN7U49xNgW8JKuPf6afddxr3zON7UTkLpuhNwH/VJNZ5I4dqq3yYYsMyhGQY24E6ZZSzMoureqQgdMk/0jYV+LMg3rAzRrBAscbuk1QXxwj+PIz6MrFMbORAYMZgoHVtMX1DcqgRk+3sphi+1fPAY9IyvsGK1s3aMX8blSJTnI0K3IwNhW3HjlTsQSr7U1JMaCgyhNijZcs2pFt67GbSs4lJNNZEExB3OOH/kxE5S2UCW83MPh0QKtv+cs2CK3mZmnUN4KxsrC4AyKUadsptdceNf1He8Tp6oJNT1qHuEVXbUzKIbk6Vh94jADZZ/E1VGo0cKVvUmT89jtzRuKzsXUDfSgHYZ5hPW4sdsWWmKLGBqQlEp/fI6kKsQ6cV31p3kjZcRtKa66QFEmf862b4EB/bnvqFeXzKgSAQsaJREQll4ttSJrmz5ADcj123CIe5b6njv2MdwpE0tlf4kgCSsCP34Eu65EmKm3fcitol7fEtK0E3hXaXW1UiS/2BnWSVUQUCRq4jtSE=
+
+language: c
+dist: trusty
+osx_image: xcode8.2
+
+matrix:
+  include:
+    - os: linux
+      compiler: gcc
+      env: BUILDDIR=. TOOL="./configure --zlib-compat" DO_COVERITY=1
+    - os: linux
+      compiler: gcc
+      env: BUILDDIR=../build TOOL="../zlib-ng/configure --zlib-compat"
+    - os: linux
+      compiler: gcc
+      env: BUILDDIR=. TOOL="./configure --zlib-compat --without-optimizations --without-new-strategies"
+    - os: linux
+      compiler: gcc
+      env: BUILDDIR=. TOOL="cmake ."
+    - os: linux
+      compiler: gcc
+      env: BUILDDIR=../build TOOL="cmake ../zlib-ng"
+
+    - os: linux
+      compiler: clang
+      env: BUILDDIR=. TOOL="./configure --zlib-compat"
+    - os: linux
+      compiler: clang
+      env: BUILDDIR=../build TOOL="cmake ../zlib-ng"
+
+    - os: osx
+      compiler: gcc
+      env: BUILDDIR=. TOOL="./configure --zlib-compat"
+    - os: osx
+      compiler: gcc
+      env: BUILDDIR=../build TOOL="../zlib-ng/configure --zlib-compat"
+
+    - os: osx
+      compiler: clang
+      env: BUILDDIR=. TOOL="./configure --zlib-compat"
+    - os: osx
+      compiler: clang
+      env: BUILDDIR=../build TOOL="cmake ../zlib-ng"
+
+before_install:
+    - if [ "$DO_COVERITY" = 1 -a "$TRAVIS_BRANCH" != "coverity_branch" ]; then exit 0; fi
+    - if [ "$DO_COVERITY" != "1" ]; then
+        mkdir -p $BUILDDIR && cd $BUILDDIR && $TOOL && make && make test;
+      fi
+
+script: true
