@@ -3,13 +3,19 @@ cache: ccache
 dist: xenial
 bundler_args: --retry 5
 
+addons:
+  apt:
+    packages:
+      - kcov
+
 env:
   global:
     - BUILDDIR=.
     - MAKER="make -j2"
     - TESTER="make test"
-    - CFLAGS="-O2 -g --coverage"
+    - CFLAGS="-O2 -g3 --coverage"
     - LDFLAGS="--coverage"
+    - KCOV="kcov --exclude-pattern=/usr/include coverage"
 
 matrix:
   include:
@@ -39,16 +45,16 @@ matrix:
     #   gcc/configure
     - os: linux
       compiler: gcc
-      env: GENERATOR="./configure --warn"
+      env: GENERATOR="$KCOV ./configure --warn"
 
     - os: linux
       compiler: gcc
-      env: GENERATOR="./configure --warn --zlib-compat --without-optimizations --without-new-strategies"
+      env: GENERATOR="$KCOV ./configure --warn --zlib-compat --without-optimizations --without-new-strategies"
 
     - os: linux
       compiler: gcc
       env:
-        - GENERATOR="../zlib-ng/configure --warn --zlib-compat"
+        - GENERATOR="$KCOV ../zlib-ng/configure --warn --zlib-compat"
         - BUILDDIR=../build
 
     #   gcc/cmake
@@ -74,7 +80,7 @@ matrix:
     #   clang/configure
     - os: linux
       compiler: clang
-      env: GENERATOR="./configure --warn --zlib-compat"
+      env: GENERATOR="$KCOV ./configure --warn --zlib-compat"
 
     #   clang/cmake
     - os: linux
@@ -119,12 +125,12 @@ matrix:
     #   gcc/configure
     - os: osx
       compiler: gcc
-      env: GENERATOR="./configure --warn"
+      env: GENERATOR="$KCOV ./configure --warn"
 
     - os: osx
       compiler: gcc
       env:
-        - GENERATOR="../zlib-ng/configure --warn --zlib-compat"
+        - GENERATOR="$KCOV ../zlib-ng/configure --warn --zlib-compat"
         - BUILDDIR=../build
 
     #   gcc/cmake
@@ -137,7 +143,7 @@ matrix:
     #   clang/configure
     - os: osx
       compiler: clang
-      env: GENERATOR="./configure --warn --zlib-compat"
+      env: GENERATOR="$KCOV ./configure --warn --zlib-compat"
 
     #   clang/cmake
     - os: osx
@@ -164,7 +170,7 @@ matrix:
     #   clang/configure
     - os: linux-ppc64le
       compiler: clang
-      env: GENERATOR="./configure --warn --zlib-compat"
+      env: GENERATOR="$KCOV ./configure --warn --zlib-compat"
 
     #   clang/cmake
     - os: linux-ppc64le
@@ -242,7 +248,7 @@ matrix:
             - gcc-arm-linux-gnueabihf
             - libc-dev-armhf-cross
       env:
-        - GENERATOR="./configure --warn"
+        - GENERATOR="$KCOV ./configure --warn"
         - CHOST=arm-linux-gnueabihf
 
     - os: linux
@@ -254,7 +260,7 @@ matrix:
             - gcc-arm-linux-gnueabihf
             - libc-dev-armhf-cross
       env:
-        - GENERATOR="./configure --warn --zlib-compat --without-neon"
+        - GENERATOR="$KCOV ./configure --warn --zlib-compat --without-neon"
         - CHOST=arm-linux-gnueabihf
 
     - os: linux
@@ -266,7 +272,7 @@ matrix:
             - gcc-arm-linux-gnueabihf
             - libc-dev-armhf-cross
       env:
-        - GENERATOR="./configure --warn --zlib-compat"
+        - GENERATOR="$KCOV ./configure --warn --zlib-compat"
         - CHOST=arm-linux-gnueabihf
 
     #   gcc/cmake
@@ -320,7 +326,7 @@ matrix:
             - gcc-arm-linux-gnueabi
             - libc-dev-armel-cross
       env:
-        - GENERATOR="./configure"
+        - GENERATOR="$KCOV ./configure"
         - CHOST=arm-linux-gnueabi
 
     - os: linux
@@ -332,7 +338,7 @@ matrix:
             - gcc-arm-linux-gnueabi
             - libc-dev-armel-cross
       env:
-        - GENERATOR="./configure --zlib-compat"
+        - GENERATOR="$KCOV ./configure --zlib-compat"
         - CHOST=arm-linux-gnueabi
 
     #   gcc/cmake
@@ -367,7 +373,7 @@ script:
   - cd $BUILDDIR
   - $GENERATOR
   - $MAKER
-  - $TESTER
+  - $KCOV $TESTER
 
 after_success:
   - bash <(curl -s https://codecov.io/bash --connect-timeout 10 --retry 8 --retry-delay 10) -U "--connect-timeout 10 --retry 8 --retry-delay 10"
