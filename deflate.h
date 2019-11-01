@@ -361,7 +361,7 @@ void ZLIB_INTERNAL flush_pending(PREFIX3(streamp) strm);
     s->sym_buf[s->sym_next++] = 0; \
     s->sym_buf[s->sym_next++] = cc; \
     s->dyn_ltree[cc].Freq++; \
-    flush = (s->sym_next == s->sym_end); \
+    flush += (s->sym_next == s->sym_end); \
   }
 # define zng_tr_tally_dist(s, distance, length, flush) \
   { unsigned char len = (unsigned char)(length); \
@@ -372,12 +372,13 @@ void ZLIB_INTERNAL flush_pending(PREFIX3(streamp) strm);
     dist--; \
     s->dyn_ltree[zng_length_code[len]+LITERALS+1].Freq++; \
     s->dyn_dtree[d_code(dist)].Freq++; \
-    flush = (s->sym_next == s->sym_end); \
+    flush += (s->sym_next == s->sym_end); \
   }
 #else
-#   define zng_tr_tally_lit(s, c, flush) flush = zng_tr_tally(s, 0, c)
+#   define zng_tr_tally_lit(s, c, flush) \
+            flush += zng_tr_tally(s, 0, c)
 #   define zng_tr_tally_dist(s, distance, length, flush) \
-              flush = zng_tr_tally(s, (unsigned)(distance), (unsigned)(length))
+            flush += zng_tr_tally(s, (unsigned)(distance), (unsigned)(length))
 #endif
 
 /* ===========================================================================

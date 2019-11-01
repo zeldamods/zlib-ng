@@ -22,34 +22,26 @@ struct match {
 
 #define MAX_DIST2  ((1 << MAX_WBITS) - MIN_LOOKAHEAD)
 
-static int tr_tally_dist(deflate_state *s, int distance, int length) {
-    return zng_tr_tally(s, distance, length);
-}
-
-static int tr_tally_lit(deflate_state *s, int c) {
-    return zng_tr_tally(s, 0, c);
-}
-
 static int emit_match(deflate_state *s, struct match match) {
-    int flush = 0;
+    int bflush = 0;
 
     /* matches that are not long enough we need to emit as literals */
     if (match.match_length < MIN_MATCH) {
         while (match.match_length) {
-            flush += tr_tally_lit(s, s->window[match.strstart]);
+            zng_tr_tally_lit(s, s->window[match.strstart], bflush);
             s->lookahead--;
             match.strstart++;
             match.match_length--;
         }
-        return flush;
+        return bflush;
     }
 
     check_match(s, match.strstart, match.match_start, match.match_length);
 
-    flush += tr_tally_dist(s, match.strstart - match.match_start, match.match_length - MIN_MATCH);
+    zng_tr_tally_dist(s, match.strstart - match.match_start, match.match_length - MIN_MATCH, bflush);
 
     s->lookahead -= match.match_length;
-    return flush;
+    return bflush;
 }
 
 static void insert_match(deflate_state *s, struct match match) {
@@ -313,7 +305,7 @@ ZLIB_INTERNAL block_state deflate_medium(deflate_state *s, int flush) {
         /* move the "cursor" forward */
         s->strstart += current_match.match_length;
 
-        if (bflush)
+        if (bflush > 0)
             FLUSH_BLOCK(s, 0);
     }
     s->insert = s->strstart < MIN_MATCH-1 ? s->strstart : MIN_MATCH-1;
