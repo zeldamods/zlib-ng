@@ -297,7 +297,7 @@ ZLIB_INTERNAL block_state deflate_medium(deflate_state *s, int flush) {
             }
 
             /* short matches with a very long distance are rarely a good idea encoding wise */
-            if (next_match.match_length == 3 && (next_match.strstart - next_match.match_start) > 12000)
+            if (next_match.match_length == 3 && (next_match.strstart - next_match.match_start) > 1500)
                     next_match.match_length = 1;
             s->strstart = current_match.strstart;
 
