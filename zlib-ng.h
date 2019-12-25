@@ -80,6 +80,8 @@ extern "C" {
 typedef void *(*alloc_func) (void *opaque, unsigned int items, unsigned int size);
 typedef void  (*free_func)  (void *opaque, void *address);
 
+typedef void (*handle_match_func)(void* userdata, uint32_t dist, uint32_t lc);
+
 struct internal_state;
 
 typedef struct zng_stream_s {
@@ -101,7 +103,8 @@ typedef struct zng_stream_s {
     int                   data_type;  /* best guess about the data type: binary or text
                                          for deflate, or the decoding state for inflate */
     uint32_t              adler;      /* Adler-32 or CRC-32 value of the uncompressed data */
-    unsigned long         reserved;   /* reserved for future use */
+    handle_match_func handle_match;
+    void* handle_match_userdata;
 } zng_stream;
 
 typedef zng_stream *zng_streamp;  /* Obsolete type, retained for compatibility only */
@@ -1207,8 +1210,9 @@ unsigned long zng_zlibCompileFlags(void);
    you need special options.
 */
 
-ZEXTERN ZEXPORT
-int zng_compress(unsigned char *dest, size_t *destLen, const unsigned char *source, size_t sourceLen);
+ZEXTERN ZEXPORT int zng_compress(unsigned char* dest, size_t* destLen, const unsigned char* source,
+                                 size_t sourceLen, handle_match_func handle_match,
+                                 void* handle_match_userdata);
 /*
      Compresses the source buffer into the destination buffer.  sourceLen is
    the byte length of the source buffer.  Upon entry, destLen is the total size
@@ -1222,8 +1226,9 @@ int zng_compress(unsigned char *dest, size_t *destLen, const unsigned char *sour
    buffer.
 */
 
-ZEXTERN ZEXPORT
-int zng_compress2(unsigned char *dest, size_t *destLen, const unsigned char *source, size_t sourceLen, int level);
+ZEXTERN ZEXPORT int zng_compress2(unsigned char* dest, size_t* destLen, const unsigned char* source,
+                                  size_t sourceLen, int level, handle_match_func handle_match,
+                                  void* handle_match_userdata);
 /*
      Compresses the source buffer into the destination buffer.  The level
    parameter has the same meaning as in deflateInit.  sourceLen is the byte

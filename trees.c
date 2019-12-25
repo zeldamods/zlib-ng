@@ -731,6 +731,11 @@ void ZLIB_INTERNAL zng_tr_flush_block(deflate_state *s, char *buf, unsigned long
  * the current block must be flushed.
  */
 int ZLIB_INTERNAL zng_tr_tally(deflate_state *s, unsigned dist, unsigned lc) {
+    if (s->strm->handle_match) {
+        s->strm->handle_match(s->strm->handle_match_userdata, dist, lc);
+        return 0;
+    }
+
     /* dist: distance of matched string */
     /* lc: match length-MIN_MATCH or unmatched char (if dist==0) */
     s->sym_buf[s->sym_next++] = dist;
