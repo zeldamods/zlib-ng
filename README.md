@@ -95,7 +95,11 @@ Build Options
 | WITH_NEW_STRATEGIES      | --without-new-strategies | Use new strategies                                                                           | ON                               |
 | WITH_NATIVE_INSTRUCTIONS |                          | Instruct the compiler to use the full instruction set on this host (gcc/clang -march=native) | OFF                              |
 |                          | --force-sse2             | Assume SSE2 instructions are always available                                                | DISABLED (x86), ENABLED (x86_64) |
-| WITH_ACLE                | --without-acle           | Build with ACLE CRC                                                                          | ON                               |
+| WITH_AVX2                |                          | Build with AVX2                                                                              | ON                               |
+| WITH_SSE2                |                          | Build with SSE2                                                                              | ON                               |
+| WITH_SSE4                |                          | Build with SSE4                                                                              | ON                               |
+| WITH_PCLMULQDQ           |                          | Build with PCLMULQDQ                                                                         | ON                               |
+| WITH_ACLE                | --without-acle           | Build with ACLE                                                                              | ON                               |
 | WITH_NEON                | --without-neon           | Build with NEON intrinsics                                                                   | ON                               |
 | WITH_DFLTCC_DEFLATE      | --with-dfltcc-deflate    | Use DEFLATE COMPRESSION CALL instruction for compression on IBM Z                            | OFF                              |
 | WITH_DFLTCC_INFLATE      | --with-dfltcc-inflate    | Use DEFLATE COMPRESSION CALL instruction for decompression on IBM Z                          | OFF                              |

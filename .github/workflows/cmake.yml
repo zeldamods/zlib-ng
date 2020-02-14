@@ -9,16 +9,22 @@ jobs:
       matrix:
         name: [
           Ubuntu 18.04 GCC,
+          Ubuntu 18.04 GCC No AVX2,
+          Ubuntu 18.04 GCC No SSE2,
+          Ubuntu 18.04 GCC No SSE4,
+          Ubuntu 18.04 GCC No PCLMULQDQ,
           Ubuntu 18.04 GCC OSB,
           Ubuntu 18.04 GCC No Opt,
           Ubuntu 18.04 GCC Compat,
           Ubuntu 18.04 GCC Compat No Opt,
           Ubuntu 18.04 GCC Compat,
           Ubuntu 18.04 GCC ARM SF,
+          Ubuntu 18.04 GCC ARM SF No ACLE,
           Ubuntu 18.04 GCC ARM SF No Opt,
           Ubuntu 18.04 GCC ARM SF Compat,
           Ubuntu 18.04 GCC ARM SF Compat No Opt,
           Ubuntu 18.04 GCC ARM HF,
+          Ubuntu 18.04 GCC ARM HF No NEON,
           Ubuntu 18.04 GCC ARM HF No Opt,
           Ubuntu 18.04 GCC ARM HF Compat,
           Ubuntu 18.04 GCC ARM HF Compat No Opt,
@@ -47,6 +53,30 @@ jobs:
             compiler: gcc
             cmake-args: -DWITH_SANITIZERS=ON
             codecov: ubuntu_gcc
+
+          - name: Ubuntu 18.04 GCC No AVX2
+            os: ubuntu-18.04
+            compiler: gcc
+            cmake-args: -DWITH_SANITIZERS=ON -DWITH_AVX2=OFF
+            codecov: ubuntu_gcc_no_avx2
+
+          - name: Ubuntu 18.04 GCC No SSE2
+            os: ubuntu-18.04
+            compiler: gcc
+            cmake-args: -DWITH_SANITIZERS=ON -DWITH_SSE2=OFF
+            codecov: ubuntu_gcc_no_sse2
+
+          - name: Ubuntu 18.04 GCC No SSE4
+            os: ubuntu-18.04
+            compiler: gcc
+            cmake-args: -DWITH_SANITIZERS=ON -DWITH_SSE4=OFF
+            codecov: ubuntu_gcc_no_sse4
+
+          - name: Ubuntu 18.04 GCC No PCLMULQDQ
+            os: ubuntu-18.04
+            compiler: gcc
+            cmake-args: -DWITH_SANITIZERS=ON -DWITH_PCLMULQDQ=OFF
+            codecov: ubuntu_gcc_no_pclmulqdq
 
           - name: Ubuntu 18.04 GCC OSB
             os: ubuntu-18.04
@@ -87,6 +117,13 @@ jobs:
             packages: qemu gcc-arm-linux-gnueabi libc-dev-armel-cross
             codecov: ubuntu_gcc_armsf
 
+          - name: Ubuntu 18.04 GCC ARM SF No ACLE
+            os: ubuntu-18.04
+            compiler: arm-linux-gnueabi-gcc
+            cmake-args: -DCMAKE_TOOLCHAIN_FILE=cmake/toolchain-arm.cmake -DCMAKE_C_COMPILER_TARGET=arm-linux-gnueabi -DWITH_SANITIZERS=ON -DWITH_ACLE=OFF
+            packages: qemu gcc-arm-linux-gnueabi libc-dev-armel-cross
+            codecov: ubuntu_gcc_armsf_no_acle
+
           - name: Ubuntu 18.04 GCC ARM SF No Opt
             os: ubuntu-18.04
             compiler: arm-linux-gnueabi-gcc
@@ -114,6 +151,13 @@ jobs:
             cmake-args: -DCMAKE_TOOLCHAIN_FILE=cmake/toolchain-arm.cmake -DCMAKE_C_COMPILER_TARGET=arm-linux-gnueabihf -DWITH_SANITIZERS=ON
             packages: qemu gcc-arm-linux-gnueabihf libc-dev-armel-cross
             codecov: ubuntu_gcc_armhf
+
+          - name: Ubuntu 18.04 GCC ARM HF No NEON
+            os: ubuntu-18.04
+            compiler: arm-linux-gnueabihf-gcc
+            cmake-args: -DCMAKE_TOOLCHAIN_FILE=cmake/toolchain-arm.cmake -DCMAKE_C_COMPILER_TARGET=arm-linux-gnueabihf -DWITH_SANITIZERS=ON -DWITH_NEON=OFF
+            packages: qemu gcc-arm-linux-gnueabihf libc-dev-armel-cross
+            codecov: ubuntu_gcc_armhf_no_neon
 
           - name: Ubuntu 18.04 GCC ARM HF No Opt
             os: ubuntu-18.04
@@ -211,7 +255,7 @@ jobs:
             compiler: clang
             packages: llvm-6.0
             gcov-exec: llvm-cov-6.0 gcov
-            codecov: ubuntu_clang
+            codecov: ubuntu_clang_debug
             build-config: Debug
 
           - name: Ubuntu 18.04 Clang MSAN
@@ -242,14 +286,14 @@ jobs:
           - name: Windows 2019 GCC Compat
             os: windows-2019
             compiler: gcc
-            cmake-args: -G Ninja -DZLIB_COMPAT=ON -DWITH_NEW_STRATEGIES=NO -DWITH_OPTIM=NO
-            codecov: win64_gcc
+            cmake-args: -G Ninja -DZLIB_COMPAT=ON
+            codecov: win64_gcc_compat
 
           - name: Windows 2019 GCC Compat No Opt
             os: windows-2019
             compiler: gcc
             cmake-args: -G Ninja -DZLIB_COMPAT=ON -DWITH_NEW_STRATEGIES=NO -DWITH_OPTIM=NO
-            codecov: win64_gcc
+            codecov: win64_gcc_compat_no_opt
 
           - name: macOS Clang
             os: macOS-latest
